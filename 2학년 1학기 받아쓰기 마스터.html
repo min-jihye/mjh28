@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>부평남초등학교 2학년 받아쓰기 마스터!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Jua', sans-serif; background-color: #fce4ec; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px 0; }
+        .game-container { background-color: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); text-align: center; width: 360px; }
+        h1 { color: #ff4081; margin-bottom: 15px; font-size: 26px; line-height: 1.3; }
+        .status-board { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 18px; background-color: #fff9db; padding: 10px; border-radius: 10px; border: 1px dashed #f59f00; }
+        .score-box { color: #e67e22; font-weight: bold; }
+        select { font-family: 'Jua', sans-serif; font-size: 18px; padding: 10px; border-radius: 10px; border: 2px solid #4fc3f7; margin-bottom: 15px; width: 100%; outline: none; }
+        #progressInfo { color: #757575; font-size: 18px; margin-bottom: 20px; }
+        .btn-speak { background-color: #4fc3f7; color: white; border: none; padding: 12px; font-size: 20px; border-radius: 50px; cursor: pointer; width: 100%; margin-bottom: 20px; transition: 0.2s; }
+        .btn-speak:hover { background-color: #29b6f6; transform: translateY(-2px); }
+        .input-group { display: flex; gap: 5px; justify-content: center; }
+        input[type="text"] { padding: 10px; font-size: 16px; border: 2px solid #e0e0e0; border-radius: 10px; width: 70%; font-family: 'Jua', sans-serif; outline: none; transition: border-color 0.3s; }
+        input[type="text"]:focus { border-color: #ff4081; }
+        .btn-check { background-color: #ff4081; color: white; border: none; padding: 10px 15px; font-size: 16px; border-radius: 10px; cursor: pointer; font-family: 'Jua', sans-serif; }
+        #result { margin-top: 20px; font-size: 20px; min-height: 30px; }
+        .wrong-notebook { margin-top: 25px; border-top: 2px dashed #e0e0e0; padding-top: 20px; text-align: left; }
+        .wrong-title { font-size: 18px; color: #c0392b; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .wrong-list { max-height: 150px; overflow-y: auto; background: #f9f9f9; padding: 10px; border-radius: 10px; font-size: 15px; color: #555; list-style: none; margin: 0; padding-left: 10px; }
+        .wrong-item { padding: 5px 0; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .wrong-item:hover { color: #ff4081; background-color: #fff0f6; }
+        .btn-retry { background-color: #2ecc71; color: white; border: none; padding: 3px 8px; font-size: 12px; border-radius: 50px; cursor: pointer; font-family: 'Jua', sans-serif; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>
+            🎧 부평남초등학교<br>
+            2학년 받아쓰기 마스터!
+        </h1>
+        
+        <div class="status-board">
+            <span>✨ 현재 점수</span>
+            <span class="score-box"><span id="score">0</span>점</span>
+        </div>
+
+        <select id="levelSelect">
+            <option value="level1">1급</option>
+            <option value="level2">2급</option>
+            <option value="level3">3급</option>
+            <option value="level4">4급</option>
+            <option value="level5">5급</option>
+            <option value="level6">6급</option>
+            <option value="level7">7급</option>
+            <option value="level8">8급</option>
+            <option value="level9">9급</option>
+            <option value="level10">10급</option>
+            <option value="level11">11급</option>
+            <option value="level12">12급</option>
+            <option value="level13">13급</option>
+            <option value="level14">14급</option>
+            <option value="level15">15급</option>
+            <option value="level16">16급</option>
+        </select>
+        <p id="progressInfo"></p>
+        <button id="speakBtn" class="btn-speak">🔊 문장 듣기</button>
+        <div class="input-group">
+            <input type="text" id="wordInput" placeholder="여기에 적어줘!" autofocus autocomplete="off">
+            <button id="checkBtn" class="btn-check">확인</button>
+        </div>
+        <p id="result"></p>
+
+        <div class="wrong-notebook">
+            <div class="wrong-title">
+                <span>📝 나만의 오답노트</span>
+                <span style="font-size: 14px; color: #7f8c8d;">(클릭하면 재도전)</span>
+            </div>
+            <ul id="wrongList" class="wrong-list">
+                <li style="text-align: center; color: #aaa; padding: 10px 0;">아직 틀린 문장이 없어요! 훌륭해요!</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const dictationData = {
+            "level1": ["말 차례를 지키며 대화하기", "제 꿈은 과학자입니다.", "왜 되고 싶은가요?", "아직 안 끝났는데", "왜 갑자기 끼어들지?", "세상에 둘도 없는", "작아지면 물려받습니다.", "물려받지 않는 것은", "라라는 신발을 좋아합니다.", "늘 새것이니까요."],
+            "level2": ["누가 뭐래도 둘도 없는", "햇빛에 반짝반짝 빛나는", "“더러워질 텐데……”", "앗, 어떡하지?", "돌에 채어 넘어졌고", "중심을 잃고 비틀거렸고", "엉덩방아를 찧었습니다.", "모두 함빡 젖고 말았어요.", "써도 되지 않을까?", "상관없다는 듯 말했습니다."],
+            "level3": ["국숫발같이 가늘다고 가랑비", "이슬이 맺힐 만큼 내려서", "넌 밝게 웃어.", "비슷한 것을 떠올려서", "귀여우면 곰 인형", "과일 가게에 가면", "동네 앞에 왔다", "낱말을 넣어 첫 문장을", "한 개가 떨어져 있다.", "시원하다고 느꼈던 경험"],
+            "level4": ["아주 시원시원하네!", "더위를 식힐 정도로", "속이 후련할 만큼", "음식이 뜨겁고 얼큰할 때", "막힌 데가 없이 활짝 트여", "좋아하는 표정이 재미있어요.", "읽고 싶은 책을 찾아", "만든 책갈피 가운데에서", "낱말을 활용하는 말놀이", "식당 이름 재미있게 짓기"],
+            "level5": ["겪은 일을 나타내요.", "넓은 옥수수밭에 갔다.", "나를 보고 활짝 웃으셨다.", "꾸며주는 말을 넣어", "파도가 모래밭으로 몰려온다.", "황새가 날갯짓을 한다.", "넓은 하늘로 발사되었다.", "식물은 어떻게 자랄까?", "조그만 새싹이 쑥쑥 자라", "노랑 꽃을 활짝 피웠어."],
+            "level6": ["조롱조롱 열매를 맺었구나.", "올록볼록 껍데기 속에는", "돌돌 감고 뻗어 가.", "나뭇잎이 떨어진 걸까?", "입가에 밥풀처럼 붙는다고", "자신이 겪은 일 가운데에서", "어떤 제목을 붙이면 좋을지", "날씨는 어떠했나요?", "제목은 나중에 붙여도 돼요.", "장독대에 감꽃이 떨어집니다."],
+            "level7": ["자장가를 듣다가 잠든 경험", "넓고 넓은 밤하늘엔", "산새 들새 모여 앉아", "포근포근 엄마 품엔", "본 적이 있는데 아름다웠어.", "겹받침을 바르게 읽고 쓰기", "어떻게 나누었을까요?", "눈이 와서 눈을 밟다.", "한 칸씩 말을 옮긴다.", "원래 자리로 돌아간다."],
+            "level8": ["강을 거쳐 바다로 흘러들어", "많은 사람이 노력하고", "쓰레기를 모아 없애기도", "평소에 일회용 플라스틱을", "제품을 재활용할 수 있도록", "몫을 찾아 함께 실천해요.", "물건이 한데 모여 쌓인", "물 위에 띄워 위치를", "해가 함빡 웃잖아.", "절로 휘파람이 나오는"],
+            "level9": ["오솔길을 가는데 시끌벅적한", "반갑다, 정말 반가워!", "자전거 타는 연습", "마음처럼 잘 안된다.", "힘차게 연습을 시작했지만", "칭찬이 끝나자마자", "페달을 힘차게 밟았다.", "그럼, 아까부터 그랬단다.", "손뼉을 마주치며", "혼자 탈 수 있게 되어"],
+            "level10": ["할머니께서 키우시는", "여행을 떠나시게 되어", "설레는 마음으로 고개를", "조금 낯선 눈치였어요.", "꽤 친해진 기분이 들었어요.", "너무 짧은 것 같아요.", "나는 무척 아쉬웠지만", "애들은 눈이 휘둥그레져서", "삶은 밤 한 개를", "울음을 그쳤어요."],
+            "level11": ["줄넘기를 하면 좋은 점이", "몸 전체를 움직여서 하는", "동작을 바꿔가며 뛸 수", "지루하지 않게 운동할 수", "언제 어디서나 손쉽게", "주의 깊게 본 적이 있나요.", "거센 바람에도 쉽게", "뿌리가 깊고 넓게 퍼져", "마치 빨대처럼 흙에서", "줄기를 거쳐 잎까지"],
+            "level12": ["굵고 통통한 모양으로", "오랜만에 친척들을 만나면", "시원한 바람을 맞으면", "산에 가도 재밌겠네요.", "많이 못 탔거든요.", "얼마나 아쉬웠는지 몰라요.", "태어나기 훨씬 전에", "일어났던 일들도", "고개를 끄덕였습니다.", "우애가 깊은 형제"],
+            "level13": ["혼자서 그것도 못 옮기니?", "무거워서 힘들어하는 것", "우산을 놓고 내려서", "잃어버려 찾고 있는 것을", "머리핀을 주웠다.", "등굣길에 떨어진 필통을", "안내문을 붙여 볼 거야.", "남극에 사는 펭귄을 봤어.", "자신이 직접 한 일 외에", "생각이나 느낌은 어떠했나요"],
+            "level14": ["너 때문에 그림을 망쳤잖아.", "다친 데는 괜찮은지", "물들이 튀지 않게 조심해주면", "굵은 빗방울이 쏟아졌습니다.", "햇살을 받아 반짝반짝", "낯선 물고기가 헤엄쳐 오고", "험상궂게 생긴 데다가", "옆으로 길게 찢어져", "달라붙어서 떨어지지", "모두 쫓아버렸습니다."],
+            "level15": ["우산 속에서 팔짱 낀", "기쁜 마음이 들었을거야.", "몸짓을 주고받아 본 적이", "신발 끈도 못 묶고", "건널목에서 우리 마주쳤다.", "팔을 휘휘 흔들자", "세차고 가볍게 뛰어오르는", "현관 앞에 앉아 있었어요.", "한 번도 못 받았거든.", "나한테 편지를 안 보내."],
+            "level16": ["편지를 봉투에다 넣었어요.", "집 밖으로 뛰어나갔어요.", "낮잠을 자고 있었어요.", "기다리는 데 지쳤어.", "편지를 보낼지도 모르잖아?", "굵고 튼튼하게 꼰 줄", "밧줄을 목에 감고 계시네.", "잡아당기면 어떡해?", "누가 내 친구를 괴롭혀?", "머리를 부딪혀 쓰러지며"]
+        };
+
+        const levelSelect = document.getElementById('levelSelect');
+        const progressInfo = document.getElementById('progressInfo');
+        const wordInput = document.getElementById('wordInput');
+        const resultText = document.getElementById('result');
+        const scoreDisplay = document.getElementById('score');
+        const wrongListDisplay = document.getElementById('wrongList');
+
+        let currentLevel = "level1";
+        let currentIndex = 0;
+        let score = 0;
+        let wrongAnswers = []; 
+        let isRetryMode = false;
+        let retryWord = "";
+        let currentRetryIndex = null;
+        let isWaitingNext = false; 
+
+        function unifySpecialChars(text) {
+            return text
+                .replace(/“/g, '"').replace(/”/g, '"') 
+                .replace(/‘/g, "'").replace(/’/g, "'") 
+                .replace(/……/g, '......')             
+                .replace(/\s+/g, ' ')                  
+                .trim();
+        }
+
+        function setGame() {
+            isRetryMode = false;
+            isWaitingNext = false;
+            currentLevel = levelSelect.value;
+            const sentences = dictationData[currentLevel];
+            progressInfo.innerHTML = `진행: ${currentIndex + 1} / ${sentences.length} 번째 문장`;
+            resultText.innerHTML = "";
+            wordInput.value = "";
+            wordInput.focus();
+        }
+
+        function updateWrongNotebook() {
+            wrongListDisplay.innerHTML = "";
+            if (wrongAnswers.length === 0) {
+                wrongListDisplay.innerHTML = '<li style="text-align: center; color: #aaa; padding: 10px 0;">아직 틀린 문장이 없어요! 훌륭해요!</li>';
+                return;
+            }
+            
+            wrongAnswers.forEach((item, index) => {
+                let li = document.createElement('li');
+                li.className = 'wrong-item';
+                li.innerHTML = `<span>📌 ${item.levelLabel} ${item.num}번 문제</span> <button class="btn-retry">도전</button>`;
+                li.addEventListener('click', () => { if(!isWaitingNext) startRetry(item.text, index); });
+                wrongListDisplay.appendChild(li);
+            });
+        }
+
+        function startRetry(word, index) {
+            isRetryMode = true;
+            retryWord = word;
+            currentRetryIndex = index;
+            progressInfo.innerHTML = `🔥 <span style="color: #e74c3c;">오답노트 재도전 중!</span>`;
+            resultText.innerHTML = "🔊 문장 듣기 버튼을 눌러주세요.";
+            resultText.style.color = "#7f8c8d";
+            wordInput.value = "";
+            wordInput.focus();
+        }
+
+        levelSelect.addEventListener('change', () => { 
+            currentIndex = 0; 
+            setGame(); 
+        });
+
+        document.getElementById('speakBtn').addEventListener('click', () => {
+            const textToSpeak = isRetryMode ? retryWord : dictationData[currentLevel][currentIndex];
+            if (!textToSpeak) return;
+
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = 'ko-KR'; 
+            
+            setTimeout(() => {
+                window.speechSynthesis.speak(utterance);
+            }, 50);
+        });
+
+        function goNext() {
+            if (currentIndex < dictationData[currentLevel].length - 1) { 
+                currentIndex++; 
+                setGame(); 
+            } else { 
+                resultText.innerHTML = "🏆 이 급수 완료! 대단해요!"; 
+                isWaitingNext = false;
+            }
+        }
+
+        document.getElementById('checkBtn').addEventListener('click', () => {
+            if (isWaitingNext) return; 
+
+            const userInput = wordInput.value.trim();
+            const correctTarget = isRetryMode ? retryWord : dictationData[currentLevel][currentIndex];
+
+            if (!correctTarget) return;
+
+            if (unifySpecialChars(userInput) === unifySpecialChars(correctTarget)) {
+                score += 10;
+                scoreDisplay.innerText = score; 
+
+                if (isRetryMode) {
+                    resultText.innerHTML = "🎉 오답 통과! 정말 잘했어!";
+                    resultText.style.color = "#2ecc71";
+                    wrongAnswers.splice(currentRetryIndex, 1);
+                    updateWrongNotebook();
+                    isWaitingNext = true;
+                    setTimeout(() => setGame(), 1500);
+                } else {
+                    resultText.innerHTML = "🎉 정답! 다음으로 넘어갑니다.";
+                    resultText.style.color = "#4caf50";
+                    isWaitingNext = true;
+                    setTimeout(() => goNext(), 1200);
+                }
+            } else {
+                if (isRetryMode) {
+                    resultText.innerHTML = "❌ 아직 오타가 있어! 다시 귀 기울여 들어봐!";
+                    resultText.style.color = "#f44336";
+                } else {
+                    resultText.innerHTML = "❌ 아쉬워요! 오답노트에 넣고 다음 문제로 슝~";
+                    resultText.style.color = "#e67e22"; 
+                    
+                    const levelLabel = levelSelect.options[levelSelect.selectedIndex].text;
+                    const alreadyExists = wrongAnswers.some(item => item.text === dictationData[currentLevel][currentIndex]);
+                    
+                    if (!alreadyExists) {
+                        wrongAnswers.push({
+                            text: dictationData[currentLevel][currentIndex],
+                            levelLabel: levelLabel,
+                            num: currentIndex + 1
+                        });
+                        updateWrongNotebook();
+                    }
+                    
+                    isWaitingNext = true;
+                    setTimeout(() => goNext(), 1500); 
+                }
+            }
+        });
+        
+        wordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkBtn.click();
+        });
+
+        setGame();
+    </script>
+</body>
+</html>
